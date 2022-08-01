@@ -1,0 +1,59 @@
+const int MAX = 2000000;
+struct node
+{
+	ll mxpr = -inf, mxsu = -inf, sum = -inf, mxsub = -inf;
+	node()
+	{
+		
+	}
+	node(node left, node right)
+	{
+		mxpr = max(left.mxpr, left.sum + right.mxpr);
+		mxsu = max(right.mxsu, right.sum + left.mxsu);
+		sum = left.sum + right.sum;
+		mxsub = max({ left.mxsub, right.mxsub,left.mxsu + right.mxpr });
+	}
+};
+
+node seg[4 * N + 2];
+vector<int>v(N + 5);
+void build(int s, int e, int p)
+{
+
+	/* Leaf Node */
+	if (s == e) {
+
+		seg[p].sum = v[s];
+		seg[p].mxsu = v[s];
+		seg[p].mxpr = v[s];
+		seg[p].mxsub = v[s];
+		return;
+	}
+	int mid = (s + e) / 2;
+	build(s, mid, 2 * p);
+	build(mid + 1, e, 2 * p + 1);
+	seg[p] = node(seg[2 * p], seg[2 * p + 1]);
+}
+void update(int num, int s, int e, int p = 1) {	//O(logn)
+	if (s == e) {
+		seg[p].sum = v[s];
+		seg[p].mxsu = v[s];
+		seg[p].mxpr = v[s];
+		seg[p].mxsub = v[s];
+		return;
+	}
+	if (num > (s + e) / 2)
+		update(num, (s + e) / 2 + 1, e, 2 * p + 1);
+	else
+		update(num, s, (s + e) / 2, 2 * p);
+	seg[p] = node(seg[2 * p], seg[2 * p + 1]);
+}
+node emt;
+node get(int s, int e, int l, int r, int p) {
+	if (r < s || l>e)
+		return emt;
+	if (l <= s && r >= e)
+		return seg[p];
+	int mid = (s + e) / 2;
+	return node(get(s, mid, l, r, p * 2), get(mid + 1, e, l, r, 2 * p + 1));
+}

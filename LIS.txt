@@ -1,0 +1,15 @@
+
+int LIS(vector<ll> &S)
+{
+    vector<ll> L(S.size());
+    int lisCount = 0;
+    for (int i = 0; i < S.size(); ++i)
+    {
+        int pos = lower_bound(L.begin(), L.begin() + lisCount, S[i])- L.begin();
+        L[pos] = S[i];
+        ind[pos].push_back(i);
+        if (pos == lisCount)
+            ++lisCount;
+    }
+    return lisCount;
+}

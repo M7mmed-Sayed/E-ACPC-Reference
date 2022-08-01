@@ -1,0 +1,68 @@
+#define X real()
+#define Y imag()
+#define point complex<double>
+struct coonf
+{
+    char dcmp(double a, double b = 0)
+    {
+        return fabs(a - b) < EPS ? 0 : a < b ? -1 : 1;
+    }
+    double len(point a)
+    {
+        return hypot(a.X, a.Y);
+    }
+    double cp(point a, point b)
+    {
+        return (conj(a) * b).Y;
+    }
+
+    double distToLine(point a, point b, point c)
+    {
+        b -= a;
+        return fabs(cp(b, c - a) / len(b));
+    }
+    void sortClockwise(vector<point > &p)
+    {
+        int n = p.size(), mn = 0;
+        for (int i = 1; i < n; i++)
+            if (dcmp(p[i].Y, p[mn].Y) < 0
+                    || (!dcmp(p[i].Y, p[mn].Y) && dcmp(p[i].X, p[mn].X) < 0))
+                mn = i;
+        swap(p[mn], p[0]);
+        auto cmp = [&](const point &a, const point &b)
+        {
+            auto cross = cp(a - p[0], b - p[0]);
+            if (!dcmp(cross))
+            {
+                char tmp = dcmp(a.Y, b.Y);
+                return tmp < 0 || (!tmp && dcmp(a.X, b.X) > 0);
+            }
+            return dcmp(cross) < 0;
+        };
+        sort(p.begin() + 1, p.end(), cmp);
+    }
+
+    vector<point> convexHull(vector<point > &v, bool extra = 0)
+    {
+        sortClockwise(v);
+        vector<point > ans;
+        ans.push_back(v[0]);
+        if (v.size() == 1)
+            return ans;
+        ans.push_back(v[1]);
+        int n = sz(v);
+        for (int i = 2; i < n; i++)
+        {
+            while (sz(ans) > 1)
+            {
+                auto cross = cp(ans.back() - ans[sz(ans) - 2],
+                                v[i] - ans[sz(ans) - 2]);
+                if (dcmp(cross) < 0 || (extra && !dcmp(cross)))
+                    break;
+                ans.pop_back();
+            }
+            ans.push_back(v[i]);
+        }
+        return ans;
+    }
+};

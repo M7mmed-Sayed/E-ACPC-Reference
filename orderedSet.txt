@@ -1,0 +1,8 @@
+using namespace __gnu_pbds;
+template<typename key>
+using ordered_set=tree <key,null_type,less<key>,rb_tree_tag,tree_order_statistics_node_update>;
+    ordered_set X;
+    X.insert(1);
+    cout<<*X.find_by_order(1)<<endl; // 2
+    cout<<X.order_of_key(-5)<<endl;  // 0
+  

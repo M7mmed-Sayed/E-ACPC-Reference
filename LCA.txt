@@ -1,0 +1,164 @@
+struct LCA
+{
+    vector<vector<int>>adj;
+    int tap[N][20];
+    int vis[N];
+    int dep[N];
+    int par[N];
+    LCA()
+    {
+        memset(vis, 0, sizeof vis);
+        memset(dep, 0, sizeof dep);
+        memset(tap, 0, sizeof tap);
+        memset(par, 0, sizeof par);
+    }
+    void bfs()
+    {
+        queue<pair<int, int>>q;
+        q.push({ 1,0 });
+        vis[1] = 1;
+        while (sz(q))
+        {
+            int p = q.front().first;
+            int deg = q.front().second;
+            q.pop();
+            for (auto i : adj[p])
+            {
+                if (vis[i])continue;
+                vis[i]++;
+                tap[i][0] = p;
+                int ch = 1;
+                for (int j = 1; j <= 19; j++)
+                {
+                    tap[i][j] = tap[tap[i][j - 1]][j - 1];
+                }
+                dep[i] = deg + 1;
+                q.push({ i,deg + 1 });
+            }
+        }
+    }
+    int nod = 1, mx = 0;
+    void dfs(int x, int y)
+    {
+        vis[x] = 1;
+        if (mx < y)mx = y, nod = x;
+        for (auto i : adj[x])if (!vis[i])dfs(i, y + 1);
+    }
+    void dfs1(int x, int pa)
+    {
+        par[x] = 1;
+        for (auto i : adj[x])
+        {
+            if (i != pa)
+            {
+                dfs1(i, x);
+                par[x] += par[i];
+            }
+        }
+    }
+    int fun(int x, int y)
+    {
+        int def = dep[x] - dep[y];
+        if (def < 0)
+            swap(x, y);
+        def = abs(def);
+        for (int i = 0; i < 20; i++)
+        {
+            if ((1 << i) & def)
+            {
+                x = tap[x][i];
+            }
+        }
+        int c = 0;
+        if (x == y)return def;
+        for (int i = 19; i >= 0; i--)
+        {
+            if (tap[x][i] && tap[y][i])
+            {
+                if (tap[x][i] != tap[y][i])
+                {
+                    c += (1 << i);
+                    x = tap[x][i];
+                    y = tap[y][i];
+                }
+            }
+        }
+        return c * 2 + def + 2;
+    }
+    pair<int,int> fun2(int x, int y)
+    {
+        int def = dep[x] - dep[y];
+        bool ok = 0;
+        if (def < 0)
+        {
+            ok = 1;
+            swap(x, y);
+        }
+        def = abs(def);
+        for (int i = 0; i < 20; i++)
+        {
+            if ((1 << i) & def)
+            {
+                x = tap[x][i];
+            }
+        }
+        int c = 0;
+        if (x == y)return { -1,-1 };
+        for (int i = 19; i >= 0; i--)
+        {
+            if (tap[x][i] && tap[y][i])
+            {
+                if (tap[x][i] != tap[y][i])
+                {
+                    c += (1 << i);
+                    x = tap[x][i];
+                    y = tap[y][i];
+                }
+            }
+        }
+        if (ok)swap(x, y);
+        return { x,y };
+    }
+    void insert(int p, int i)
+    {
+        dep[i] = dep[p] + 1;
+        tap[i][0] = p;
+        tap[i][1] = tap[p][0];
+        int ch = 1;
+        for (int j = 2; j < 20; j++)
+        {
+            tap[i][j] = tap[tap[p][j - 1]][j - 2];
+        }
+    }
+    int findnode(int p, int v)
+    {
+        for (int j = 20; j >= 0; j--)
+        {
+            if (v & (1 << j))
+            {
+                p = tap[p][j];
+            }
+        }
+        return p;
+    }
+    pair<int, int>pp = { 1, 1 };
+    int mxdimat(int y,int x)
+    {
+        int mx1 = fun(y, x);
+        return mx1;
+    }
+    void build()
+    {
+        bfs();
+        memset(vis, 0, sizeof vis);
+        dfs(1, 0);
+        pp.first = nod;
+        memset(vis, 0, sizeof vis);
+        mx = 0;
+        dfs(nod, 0);
+        pp.second =  nod;
+ 
+        dfs1(1, -1);
+ 
+    }
+};

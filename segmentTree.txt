@@ -1,0 +1,40 @@
+struct Segmant
+{
+    const int MAX = 2000000;
+    ll interval[4194304];	
+    int S = 0, E = MAX;
+    vector<ll>v(2000002);
+    Segmant()
+    {
+    }
+    ll build(int s, int e, int p = 1)  	// O(nlogn)
+    {
+        if (s == e)	return  interval[p] = (1);
+        return interval[p] =min( build(s, (s + e) / 2, 2 * p), build((s + e) / 2 + 1, e, 2 * p + 1));
+    }
+    void insert(int num, int s = S, int e = E, int p = 1,int val)  	//O(logn)
+    {
+        if (s == e)
+        {
+            interval[p] = val;
+            return;
+        }
+        if (num > (s + e) / 2)
+            insert(num, (s + e) / 2 + 1, e, 2 * p + 1,val);
+        else
+            insert(num, s, (s + e) / 2, 2 * p,val);
+        interval[p] = min(interval[2 * p], interval[2 * p + 1]);
+    }
+    ll getsum( int s, int e, int l, int r,int p=1)
+    {
+        if (l <= s && r >= e)
+        {
+            return interval[p];
+        }
+        if (e < l || s > r)
+            return 1e14;
+        int mid = (s + e) / 2;
+        return min(getsum(s, mid, l, r, 2 * p ),
+                   getsum( mid + 1, e, l, r, 2 * p + 1));
+    }
+};

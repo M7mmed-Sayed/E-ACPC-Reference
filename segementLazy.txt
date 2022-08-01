@@ -1,0 +1,64 @@
+const int MAX = 2000000;
+ll interval[4*N];
+ll lazy[4*N];
+int S = 0, E = MAX;
+vector<ll>v(N);
+void build(int s, int e, int p = 1)
+{
+    if (s == e){  interval[p] = (v[s]) ;return ;}
+    build(s, (s + e) / 2, 2 * p); build((s + e) / 2 + 1, e, 2 * p + 1);
+        interval[p]=min(interval[p*2],interval[p*2+1]);
+}
+void update( int s, int e, int l, int r,int p,ll value)
+{
+    if(lazy[p] != 0)
+    {
+        interval[p] += lazy[p];
+        if(s != e)
+        {
+            lazy[p*2] += lazy[p];
+            lazy[p*2+1] += lazy[p];
+        }
+
+        lazy[p] = 0;
+    }
+    if (e < l || s > r)
+        return ;
+    if (l <= s && r >= e)
+    {
+        interval[p]+=value;
+        if(s!=e)
+        {
+            lazy[p*2]+= value;
+            lazy[p*2+1]+= value;
+        }
+       return ;
+    }
+
+    int mid = (s + e) / 2;
+    update(s, mid, l, r, 2 * p,value );
+    update( mid + 1, e, l, r, 2 * p + 1,value);
+    interval[p]=min(interval[p*2],interval[p*2+1]);
+}
+ll getmn( int s, int e, int l, int r,int p=1)
+{
+    if (e < l || s > r)
+        return 1e14;
+    if(lazy[p] != 0)
+    {
+        interval[p]+= lazy[p];
+        if(s != e)
+        {
+            lazy[p*2] += lazy[p];
+            lazy[p*2+1] += lazy[p];
+        }
+        lazy[p] = 0;
+    }
+    if (l <= s && r >= e)
+    {
+        return interval[p];
+    }
+    int mid = (s + e) / 2;
+    return min(getmn(s, mid, l, r, 2 * p ),
+               getmn( mid + 1, e, l, r, 2 * p + 1));
+}

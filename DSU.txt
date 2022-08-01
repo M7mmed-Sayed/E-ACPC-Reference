@@ -1,0 +1,36 @@
+struct unionfind
+{
+	vector<int>par, szco;
+	vector<ll>sum;
+	int mx = 1;
+	unionfind(int n) {
+		par.clear();
+		mx = 0;
+		szco = par = vector<int>(2 * n + 5);
+		sum = vector<ll>(2 * n + 5);
+		for (int i = 1; i <= n; i++)
+		{
+			par[i] = i;
+			szco[i] = 1;
+		}
+	}
+	int find_set(int x)
+	{
+		if (x == par[x])return x;
+		return par[x] = find_set(par[x]);
+	}
+	bool unionset(int x, int y) {
+		x = find_set(x), y = find_set(y);
+		if (x == y)return 0;
+		if (szco[x] <= szco[y])swap(x, y);
+		par[y] = x;
+		szco[x] += szco[y];
+		return x != y;
+	}
+ 
+	bool ok(int x, int y) {
+		x = find_set(x), y = find_set(y);
+		return x == y;
+	}
+ 
+};

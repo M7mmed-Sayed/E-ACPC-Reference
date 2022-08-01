@@ -1,0 +1,38 @@
+class Solution {
+public:
+ string patern(const string &s) {
+    string sup = "+";
+    for (int i = 0; i < s.size(); i++)
+    { sup += "-";sup.push_back(s[i]);}
+    sup += "-*";
+    return sup;
+}
+
+string Manacher(const string &s) {
+    string ss = patern(s);// convert make Palindromic odd
+    int c = 0, r = 0;
+    cout<<ss<<endl;
+     vector<int>len(ss.size()+10);
+    for (int i = 1; i < ss.size() - 1; i++) {
+        int filp = c - (i - c);
+        if(r > i) len[i] = min(r - i, len[filp]);
+        while (ss[i + 1 + len[i]] == ss[i - 1 - len[i]])len[i]++;
+        if (i + len[i] > r) {
+            c = i;
+            r = i + len[i];
+        }
+    }
+    int mx = 0, ind = 0;
+    for (int i = 1; i < ss.size() - 1; i++) {
+
+        if (len[i] > mx) {
+            mx = len[i];
+            ind = i;
+        }
+    }
+    return s.substr( (ind - 1 - mx) / 2, mx);
+}
+    string longestPalindrome(string s) {
+        return Manacher(s);
+    }
+};
